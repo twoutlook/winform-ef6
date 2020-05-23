@@ -19,7 +19,7 @@ namespace WindowsFormsApp7
         {
             Control control = (Control)sender;
             //dataGridView1.Width = control.Width - 8;
-           
+
             //dataGridView1.Size = new Size(control.Size.Width - 38, dataGridView1.Height);
         }
         public Form1()
@@ -43,77 +43,38 @@ namespace WindowsFormsApp7
         }
         private void Btn1_Click(object sender, EventArgs e)
         {
-            lbl1.Text = "好久不見";
+            var v1 = txt1.Text;
+            var v1Like = "%" + v1+ "%";
 
-            var maxRec = 20;
+            var v2 = radioButton1.Checked;
             using (XUELONGEntities context = new XUELONGEntities())
             {
-                var obj = context.V_STOCK_CURRENT_List.Where(s => s.cinvcode == "AB");
-                obj.Load();
-                //dataGridView1.DataSource = obj;
-                //dataGridView1.Dock = DockStyle.Fill;
-                //DataAdapter = new
-                //https://stackoverflow.com/questions/42114690/what-is-the-correct-way-to-use-entity-framework-as-datasource-for-datagridview
-                //t will work but the DbContext cannot track changes that way, you should use 
-                
-                context.V_STOCK_CURRENT_List.Where(s => s.cinvcode == "AB").Load(); 
+
+                //context.V_STOCK_CURRENT_List.Where(s => s.cinvcode == v1).Load();
+                if (v2)
+                {
+                    context.V_STOCK_CURRENT_List.Where(s => DbFunctions.Like(s.cinvcode, v1Like)).Take(999).Load();
+                }
+                else
+                {
+                    context.V_STOCK_CURRENT_List.Where(s => s.cinvcode == v1).Take(999).Load();
+
+
+                }
                 dataGridView1.DataSource = context.V_STOCK_CURRENT_List.Local.ToBindingList();
-                dataGridView1.AutoResizeColumns();
-                dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.LightGray;
-                dataGridView1.EnableHeadersVisualStyles = false;
-                dataGridView1.ReadOnly = true;
-                dataGridView1.AllowUserToAddRows = false;
-
-                //dataGridView1.RowTemplate.Resizable = DataGridViewTriState.True;
-
-                //dataGridView1.RowTemplate.Height = 50;
-                foreach(DataGridViewRow row in dataGridView1.Rows )
+                foreach(DataGridViewRow row in dataGridView1.Rows)
                 {
-                    row.Height = 35;
+                    row.HeaderCell.Value = (row.Index + 1).ToString();
                 }
 
-
-
-                var cnt = 0;
-                //foreach (var x in context.V_BASE_CARGOSPACE_L.Where(s => s.cpositioncode == "XL-001"))
-                foreach (var x in context.V_STOCK_CURRENT_List.Where(s => s.cinvcode == "AB"))
-                {
-                    cnt += 1;
-                    if (cnt > maxRec)
-                    {
-                        break;
-                    }
-                    foreach (var col in x.GetType().GetProperties())
-                    {
-                        //show(col.ToString());
-
-                        //show(col.Name.ToString());
-
-                        var v2 = context.Entry(x).Property(col.Name.ToString()).CurrentValue;
-                        if (v2 != null)
-                        {
-
-                            show2(v2.ToString());
-                        }
-
-
-
-
-
-                    }
-
-                }
             }
+            lblMsg.Text = "[庫存管理->庫存查詢]模糊查詢料號 " + txt1.Text;
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void btn2_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
+            lblMsg.Text = "";
+            dataGridView1.DataSource = null;
         }
     }
 }
